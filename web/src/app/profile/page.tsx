@@ -3,8 +3,18 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, Save, X, Edit2, Loader2 } from "lucide-react";
+import {
+  User,
+  Mail,
+  Lock,
+  Save,
+  X,
+  Edit2,
+  Loader2,
+  Wallet,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import WalletConnectModal from "@/components/WalletConnectModal";
 
 export default function ProfilePage() {
   const { data: session, update } = useSession();
@@ -13,6 +23,12 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [walletInfo, setWalletInfo] = useState<{
+    address: string | null;
+    type: string | null;
+    connected: boolean;
+  }>({ address: null, type: null, connected: false });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -27,8 +43,58 @@ export default function ProfilePage() {
         ...prev,
         name: session.user.name || "",
       }));
+      fetchWalletInfo();
     }
   }, [session]);
+
+  const fetchWalletInfo = async () => {
+    try {
+      const response = await fetch("/api/wallet/info");
+      if (response.ok) {
+        const data = await response.json();
+        setWalletInfo(data.wallet);
+      }
+    } catch (error) {
+      console.error("Error fetching wallet info:", error);
+    }
+  };
+
+  const handleWalletConnect = async (walletType: string, address: string) => {
+    try {
+      const response = await fetch("/api/wallet/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: address, walletType }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setWalletInfo({
+          address: data.wallet.address,
+          type: data.wallet.type,
+          connected: true,
+        });
+        setSuccess("Wallet connected successfully!");
+        setIsWalletModalOpen(false);
+      } else {
+        setError("Failed to connect wallet");
+      }
+    } catch (error) {
+      setError("Error connecting wallet");
+    }
+  };
+
+  const handleWalletDisconnect = async () => {
+    try {
+      const response = await fetch("/api/wallet/connect", { method: "DELETE" });
+      if (response.ok) {
+        setWalletInfo({ address: null, type: null, connected: false });
+        setSuccess("Wallet disconnected successfully!");
+      }
+    } catch (error) {
+      setError("Error disconnecting wallet");
+    }
+  };
 
   const handleSave = async () => {
     setError("");
@@ -119,7 +185,9 @@ export default function ProfilePage() {
           className="mb-8"
         >
           <h1 className="text-4xl font-bold text-white mb-2">Profile</h1>
-          <p className="text-gray-400">Manage your account settings</p>
+          <p className="text-gray-400">
+            Manage your account and wallet settings
+          </p>
         </motion.div>
 
         {/* Profile Card */}
@@ -127,7 +195,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-2xl p-8"
+          className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-2xl p-8 mb-6"
         >
           {/* Profile Header */}
           <div className="flex items-center justify-between mb-8">
@@ -331,6 +399,79 @@ export default function ProfilePage() {
             )}
           </div>
         </motion.div>
+
+        {/* Wallet Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-2xl p-8"
+        >
+          <h2 className="text-xl font-bold text-white mb-6">Crypto Wallet</h2>
+
+          {walletInfo.connected ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <Wallet className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">
+                      {walletInfo.type}
+                    </p>
+                    <p className="text-xs text-gray-400 font-mono">
+                      {walletInfo.address}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-xs text-green-400">Connected</span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleWalletDisconnect}
+                className="w-full py-3 px-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 font-medium hover:bg-red-500/20 transition-all duration-200"
+              >
+                Disconnect Wallet
+              </button>
+
+              <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                <p className="text-xs text-blue-400">
+                  ℹ️ Your wallet is securely connected. You can now place bets
+                  on matches.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center mx-auto mb-4">
+                <Wallet className="w-8 h-8 text-purple-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                No Wallet Connected
+              </h3>
+              <p className="text-gray-400 text-sm mb-6">
+                Connect your crypto wallet to start betting
+              </p>
+              <button
+                onClick={() => setIsWalletModalOpen(true)}
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-white font-medium hover:from-purple-500/30 hover:to-blue-500/30 transition-all duration-200"
+              >
+                Connect Wallet
+              </button>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Wallet Connect Modal */}
+        <WalletConnectModal
+          isOpen={isWalletModalOpen}
+          onClose={() => setIsWalletModalOpen(false)}
+          onConnect={handleWalletConnect}
+        />
       </div>
     </div>
   );
