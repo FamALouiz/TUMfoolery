@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Sparkles, Mail, Lock, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -94,7 +95,12 @@ export default function LoginPage() {
           {/* Logo/Header */}
           <div className="flex flex-col items-center mb-8">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center mb-4">
-              <Sparkles className="w-8 h-8 text-purple-400" />
+              <Image
+                src="/logo.svg"
+                alt="TUMfoolery Logo"
+                width={48}
+                height={48}
+              />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
             <p className="text-gray-400 text-sm">

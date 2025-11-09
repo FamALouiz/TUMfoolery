@@ -15,6 +15,7 @@ import { getTeamLogo } from "@/lib/team-logos";
 import { KalshiMarket, KalshiMarketsResponse } from "@/lib/kalshi-types";
 import { ManifoldMarket, ManifoldMarketsResponse } from "@/lib/manifold-types";
 import ManifoldMatchCard from "@/components/ManifoldMatchCard";
+import ProfilePage from "@/app/profile/page";
 
 export default function Home() {
   const [activePage, setActivePage] = useState("dashboard");
@@ -1230,6 +1231,19 @@ export default function Home() {
             marketData={selectedMarketForChat}
           />
         )}
+      </div>
+    );
+  }
+
+  // Profile page rendering
+  if (activePage === "profile") {
+    return (
+      <div className="min-h-screen bg-[#050505] relative overflow-hidden">
+        <AnimatedBackground />
+        <Sidebar activePage={activePage} onPageChange={setActivePage} />
+        <div className="ml-72 relative z-10">
+          <ProfilePage />
+        </div>
       </div>
     );
   }

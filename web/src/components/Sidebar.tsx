@@ -1,9 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { LayoutDashboard, ChevronRight, History, User, BarChart3, GitCompare } from 'lucide-react';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import {
+  LayoutDashboard,
+  ChevronRight,
+  History,
+  User,
+  BarChart3,
+  GitCompare,
+  LogOut,
+} from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 interface SidebarProps {
   activePage: string;
@@ -12,45 +21,46 @@ interface SidebarProps {
 
 export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
   const [isMarketsExpanded, setIsMarketsExpanded] = useState(true);
+  const { data: session } = useSession();
 
   const menuItems = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
+      id: "dashboard",
+      label: "Dashboard",
       icon: LayoutDashboard,
       subItems: null,
     },
     {
-      id: 'markets',
-      label: 'Markets',
+      id: "markets",
+      label: "Markets",
       icon: BarChart3,
       subItems: [
-        { name: 'TUMfoolery', icon: '/logo.svg' },
-        { name: 'Kalshi', icon: '/kalshi.png' },
-        { name: 'Manifold', icon: '/manifold.png' },
+        { name: "TUMfoolery", icon: "/logo.svg" },
+        { name: "Kalshi", icon: "/kalshi.png" },
+        { name: "Manifold", icon: "/manifold.png" },
       ],
     },
     {
-      id: 'compare',
-      label: 'Compare',
+      id: "compare",
+      label: "Compare",
       icon: GitCompare,
       subItems: null,
     },
     {
-      id: 'history',
-      label: 'History',
+      id: "history",
+      label: "History",
       icon: History,
       subItems: null,
     },
     {
-      id: 'profile',
-      label: 'Profile',
+      id: "profile",
+      label: "Profile",
       icon: User,
       subItems: null,
     },
   ];
 
-  const handleItemClick = (item: typeof menuItems[0]) => {
+  const handleItemClick = (item: (typeof menuItems)[0]) => {
     if (item.subItems) {
       setIsMarketsExpanded(!isMarketsExpanded);
     } else {
@@ -59,8 +69,12 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
   };
 
   const isActive = (itemId: string) => {
-    if (itemId === 'markets') {
-      return activePage === 'tumfoolery' || activePage === 'kalshi' || activePage === 'manifold';
+    if (itemId === "markets") {
+      return (
+        activePage === "tumfoolery" ||
+        activePage === "kalshi" ||
+        activePage === "manifold"
+      );
     }
     return activePage === itemId;
   };
@@ -71,9 +85,16 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
       <div className="p-8 border-b border-white/5">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center">
-            <Image src="/logo.svg" alt="TUMfoolery Logo" width={100} height={100} />
+            <Image
+              src="/logo.svg"
+              alt="TUMfoolery Logo"
+              width={100}
+              height={100}
+            />
           </div>
-          <span className="text-2xl font-bold text-white tracking-tight">TUMfoolery</span>
+          <span className="text-2xl font-bold text-white tracking-tight">
+            TUMfoolery
+          </span>
         </div>
       </div>
 
@@ -89,7 +110,7 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
               <button
                 onClick={() => handleItemClick(item)}
                 className={`w-full relative transition-colors duration-200 ${
-                  itemIsActive ? 'text-white' : 'text-gray-500'
+                  itemIsActive ? "text-white" : "text-gray-500"
                 }`}
               >
                 {/* Active indicator */}
@@ -97,7 +118,7 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
                   <motion.div
                     layoutId="activeSidebarItem"
                     className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"
-                    transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                   />
                 )}
 
@@ -123,46 +144,53 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
                   {isMarketsExpanded && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
+                      animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden pl-8 mt-1 space-y-1"
                     >
-                      {Array.isArray(item.subItems) && item.subItems.map((subItem) => {
-                        const subItemId = subItem.name.toLowerCase();
-                        const subItemIsActive = activePage === subItemId;
+                      {Array.isArray(item.subItems) &&
+                        item.subItems.map((subItem) => {
+                          const subItemId = subItem.name.toLowerCase();
+                          const subItemIsActive = activePage === subItemId;
 
-                        return (
-                          <button
-                            key={subItem.name}
-                            onClick={() => onPageChange(subItemId)}
-                            className={`w-full relative transition-colors duration-200 ${
-                              subItemIsActive ? 'text-white' : 'text-gray-500'
-                            }`}
-                          >
-                            {/* Active indicator for sub-item */}
-                            {subItemIsActive && (
-                              <motion.div
-                                layoutId="activeSubItem"
-                                className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"
-                                transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
-                              />
-                            )}
-
-                            <div className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200">
-                              <div className="w-5 h-5 relative flex-shrink-0">
-                                <Image
-                                  src={subItem.icon}
-                                  alt={subItem.name}
-                                  fill
-                                  className="object-contain"
+                          return (
+                            <button
+                              key={subItem.name}
+                              onClick={() => onPageChange(subItemId)}
+                              className={`w-full relative transition-colors duration-200 ${
+                                subItemIsActive ? "text-white" : "text-gray-500"
+                              }`}
+                            >
+                              {/* Active indicator for sub-item */}
+                              {subItemIsActive && (
+                                <motion.div
+                                  layoutId="activeSubItem"
+                                  className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"
+                                  transition={{
+                                    type: "spring",
+                                    bounce: 0.2,
+                                    duration: 0.5,
+                                  }}
                                 />
+                              )}
+
+                              <div className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200">
+                                <div className="w-5 h-5 relative flex-shrink-0">
+                                  <Image
+                                    src={subItem.icon}
+                                    alt={subItem.name}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                                <span className="font-medium text-xs">
+                                  {subItem.name}
+                                </span>
                               </div>
-                              <span className="font-medium text-xs">{subItem.name}</span>
-                            </div>
-                          </button>
-                        );
-                      })}
+                            </button>
+                          );
+                        })}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -173,11 +201,25 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-6 border-t border-white/5">
-        <div className="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/10">
-          <p className="text-xs text-gray-500 mb-1">Wallet</p>
-          <p className="text-sm font-semibold text-white">0x1234...5678</p>
-        </div>
+      <div className="p-6 border-t border-white/5 space-y-3">
+        {/* User Info */}
+        {session?.user && (
+          <div className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-xs text-gray-500 mb-1">Logged in as</p>
+            <p className="text-sm font-semibold text-white truncate">
+              {session.user.name || session.user.email}
+            </p>
+          </div>
+        )}
+
+        {/* Sign Out Button */}
+        <button
+          onClick={() => signOut({ callbackUrl: "/auth/login" })}
+          className="w-full px-4 py-3 rounded-2xl bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-all duration-200 flex items-center justify-center gap-2 text-red-400 hover:text-red-300"
+        >
+          <LogOut className="w-4 h-4" />
+          <span className="text-sm font-medium">Sign Out</span>
+        </button>
       </div>
     </aside>
   );
