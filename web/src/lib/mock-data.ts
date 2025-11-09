@@ -1,0 +1,136 @@
+// Mock data for testing and demonstration purposes
+
+import { MatchPrediction } from "./types";
+
+export const mockMatches: MatchPrediction[] = [
+  {
+    id: "1",
+    teamA: { name: "Arsenal" },
+    teamB: { name: "Manchester City" },
+    market: "Arsenal to Win",
+    tumfoolery: {
+      prediction: 0.42,
+      confidence: 0.78,
+      recommendation: "No Bet",
+      expectedValue: -0.08,
+    },
+    kalshi: {
+      prediction: 0.38,
+      yesPrice: 0.38,
+      noPrice: 0.62,
+      volume: 45000,
+    },
+    manifold: {
+      prediction: 0.4,
+      yesPrice: 0.4,
+      noPrice: 0.6,
+      volume: 12500,
+    },
+    date: "2024-12-15",
+    timeSeriesData: [0.35, 0.37, 0.39, 0.4, 0.41, 0.42],
+  },
+  {
+    id: "2",
+    teamA: { name: "Liverpool" },
+    teamB: { name: "Chelsea" },
+    market: "Liverpool to Win",
+    tumfoolery: {
+      prediction: 0.65,
+      confidence: 0.82,
+      recommendation: "Strong Buy",
+      expectedValue: 0.15,
+    },
+    kalshi: {
+      prediction: 0.58,
+      yesPrice: 0.58,
+      noPrice: 0.42,
+      volume: 52000,
+    },
+    manifold: {
+      prediction: 0.6,
+      yesPrice: 0.6,
+      noPrice: 0.4,
+      volume: 18000,
+    },
+    date: "2024-12-16",
+    timeSeriesData: [0.55, 0.58, 0.61, 0.63, 0.64, 0.65],
+  },
+  {
+    id: "3",
+    teamA: { name: "Tottenham" },
+    teamB: { name: "Newcastle" },
+    market: "Tottenham to Win",
+    tumfoolery: {
+      prediction: 0.52,
+      confidence: 0.68,
+      recommendation: "Weak Buy",
+      expectedValue: 0.05,
+    },
+    kalshi: {
+      prediction: 0.48,
+      yesPrice: 0.48,
+      noPrice: 0.52,
+      volume: 28000,
+    },
+    manifold: {
+      prediction: 0.5,
+      yesPrice: 0.5,
+      noPrice: 0.5,
+      volume: 9500,
+    },
+    date: "2024-12-17",
+    timeSeriesData: [0.48, 0.49, 0.5, 0.51, 0.52, 0.52],
+  },
+  {
+    id: "4",
+    teamA: { name: "Brighton" },
+    teamB: { name: "Aston Villa" },
+    market: "Brighton to Win",
+    tumfoolery: {
+      prediction: 0.48,
+      confidence: 0.72,
+      recommendation: "Hold",
+      expectedValue: 0.02,
+    },
+    kalshi: {
+      prediction: 0.46,
+      yesPrice: 0.46,
+      noPrice: 0.54,
+      volume: 31000,
+    },
+    manifold: {
+      prediction: 0.47,
+      yesPrice: 0.47,
+      noPrice: 0.53,
+      volume: 11000,
+    },
+    date: "2024-12-18",
+    timeSeriesData: [0.44, 0.45, 0.46, 0.47, 0.48, 0.48],
+  },
+  {
+    id: "5",
+    teamA: { name: "Manchester United" },
+    teamB: { name: "West Ham" },
+    market: "Manchester United to Win",
+    tumfoolery: {
+      prediction: 0.58,
+      confidence: 0.75,
+      recommendation: "Buy",
+      expectedValue: 0.1,
+    },
+    kalshi: {
+      prediction: 0.52,
+      yesPrice: 0.52,
+      noPrice: 0.48,
+      volume: 38000,
+    },
+    manifold: {
+      prediction: 0.54,
+      yesPrice: 0.54,
+      noPrice: 0.46,
+      volume: 14500,
+    },
+    date: "2024-12-19",
+    timeSeriesData: [0.5, 0.52, 0.54, 0.56, 0.57, 0.58],
+  },
+];
