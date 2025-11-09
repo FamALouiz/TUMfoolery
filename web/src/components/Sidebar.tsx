@@ -25,7 +25,7 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
       label: 'Markets',
       icon: BarChart3,
       subItems: [
-        { name: 'TUMfoolery', icon: '/TUM.svg' },
+        { name: 'TUMfoolery', icon: '/logo.svg' },
         { name: 'Kalshi', icon: '/kalshi.png' },
         { name: 'Manifold', icon: '/manifold.png' },
       ],

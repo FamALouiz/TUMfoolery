@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TUM-blue betting flame logo">
+  <title>TUMFoolery logo</title>
+  <g transform="translate(137.5,95) scale(1.65,2)">
+    <path fill="#0065BD" id="b" d="M106.687 35.2742c-.186-1.0977-.967-2-2.0244-2.338s-2.2148-.057-3.0002.73L86.2473 49.166l-12.12-23.1455c-.5133-.9786-1.525-1.5914-2.6273-1.5914s-2.114.6128-2.6273 1.5914l-6.6277 12.656L45.62 7.5726c-.603-1.1297-1.8588-1.746-3.118-1.5297s-2.2394 1.216-2.4335 2.4827L24 111.701l42.9727 24.1654c2.6985 1.5113 5.985 1.5113 8.6836 0L119 111.701l-12.313-76.427z"/>
+  </g>
+  <g transform="translate(256,300) rotate(45)">
+    <rect x="-45" y="-45" width="90" height="90" rx="5" ry="5" fill="#FFFFFF"/>
+  </g>
+
+  <g fill="#0065BD">
+    <circle cx="256" cy="300" r="10"/>
+    <circle cx="256" cy="270" r="10"/>
+    <circle cx="286" cy="300" r="10"/>
+    <circle cx="256" cy="330" r="10"/>
+    <circle cx="226" cy="300" r="10"/>
+  </g>
+</svg>

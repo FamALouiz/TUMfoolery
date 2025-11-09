@@ -1191,7 +1191,7 @@ export default function Home() {
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
                     <Image
-                      src="/TUM.svg"
+                      src="/logo.svg"
                       alt="TUMfoolery"
                       width={40}
                       height={40}
