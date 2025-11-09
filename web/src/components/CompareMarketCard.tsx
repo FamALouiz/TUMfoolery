@@ -1,8 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  AlertCircle,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+} from "lucide-react";
 
 interface MarketSource {
   name: string;
@@ -23,6 +29,7 @@ interface CompareMarketCardProps {
   kalshiVolume?: number;
   manifoldVolume?: number;
   onSummarize: () => void;
+  onBet?: (platform: string, odds: number) => void;
 }
 
 export default function CompareMarketCard({
@@ -37,7 +44,11 @@ export default function CompareMarketCard({
   kalshiVolume,
   manifoldVolume,
   onSummarize,
+  onBet,
 }: CompareMarketCardProps) {
+  const [isBetting, setIsBetting] = useState(false);
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+
   const formatPercentage = (value: number) => `${(value * 100).toFixed(1)}%`;
 
   const sources: MarketSource[] = [
@@ -152,13 +163,14 @@ export default function CompareMarketCard({
           const isLowest =
             source.probability ===
             Math.min(...sources.map((s) => s.probability));
+          const canBet = source.name !== "TUMfoolery" && onBet;
 
           return (
             <div
               key={source.name}
               className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-1">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
                   <Image
                     src={source.logo}
@@ -202,6 +214,20 @@ export default function CompareMarketCard({
                 >
                   {formatPercentage(source.probability)}
                 </span>
+
+                {canBet && (
+                  <button
+                    onClick={() => {
+                      setSelectedPlatform(source.name);
+                      onBet(source.name, source.probability);
+                    }}
+                    disabled={isBetting}
+                    className="ml-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-400 text-xs font-medium hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 flex items-center gap-1 disabled:opacity-50"
+                  >
+                    <DollarSign className="w-3 h-3" />
+                    Bet
+                  </button>
+                )}
               </div>
             </div>
           );

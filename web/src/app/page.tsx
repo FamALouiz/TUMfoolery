@@ -10,6 +10,8 @@ import KalshiMatchCard from "@/components/KalshiMatchCard";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import CompareMarketCard from "@/components/CompareMarketCard";
 import ChatbotPanel from "@/components/ChatbotPanel";
+import BetModal from "@/components/BetModal";
+import WalletConnectModal from "@/components/WalletConnectModal";
 import { mockMatches } from "@/lib/mock-data";
 import { getTeamLogo } from "@/lib/team-logos";
 import { KalshiMarket, KalshiMarketsResponse } from "@/lib/kalshi-types";
@@ -46,6 +48,117 @@ export default function Home() {
   // Compare page state
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [selectedMarketForChat, setSelectedMarketForChat] = useState<any>(null);
+  const [betModalData, setBetModalData] = useState<{
+    isOpen: boolean;
+    team1: string;
+    team2: string;
+    marketDescription: string;
+    platform: string;
+    odds: number;
+  } | null>(null);
+
+  // Wallet state
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [walletInfo, setWalletInfo] = useState<{
+    address: string | null;
+    type: string | null;
+    connected: boolean;
+  }>({ address: null, type: null, connected: false });
+
+  const handleBet = async (
+    team1: string,
+    team2: string,
+    marketDescription: string,
+    platform: string,
+    odds: number
+  ) => {
+    setBetModalData({
+      isOpen: true,
+      team1,
+      team2,
+      marketDescription,
+      platform,
+      odds,
+    });
+  };
+
+  const handleConfirmBet = async (
+    amount: number,
+    team1: string,
+    team2: string,
+    marketDescription: string,
+    platform: string,
+    odds: number
+  ) => {
+    try {
+      const response = await fetch("/api/bets/place", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          team1,
+          team2,
+          marketDescription,
+          platform,
+          betAmount: amount,
+          odds,
+          predictedOutcome: team1, // Default to team1 for now
+        }),
+      });
+
+      if (response.ok) {
+        alert("Bet placed successfully!");
+        setBetModalData(null);
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to place bet");
+      }
+    } catch (error) {
+      console.error("Error placing bet:", error);
+      alert("Error placing bet");
+    }
+  };
+
+  const handleWalletConnect = async (walletType: string, address: string) => {
+    try {
+      const response = await fetch("/api/wallet/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: address, walletType }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setWalletInfo({
+          address: data.wallet.address,
+          type: data.wallet.type,
+          connected: true,
+        });
+        setIsWalletModalOpen(false);
+        alert("Wallet connected successfully!");
+      } else {
+        alert("Failed to connect wallet");
+      }
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      alert("Error connecting wallet");
+    }
+  };
+
+  // Fetch wallet info on mount
+  useEffect(() => {
+    const fetchWalletInfo = async () => {
+      try {
+        const response = await fetch("/api/wallet/info");
+        if (response.ok) {
+          const data = await response.json();
+          setWalletInfo(data.wallet);
+        }
+      } catch (error) {
+        console.error("Error fetching wallet info:", error);
+      }
+    };
+    fetchWalletInfo();
+  }, []);
 
   // Load saved markets from localStorage on mount
   useEffect(() => {
@@ -1202,6 +1315,15 @@ export default function Home() {
                   setSelectedMarketForChat(data);
                   setIsChatbotOpen(true);
                 }}
+                onBet={(platform, odds) => {
+                  handleBet(
+                    data.team1,
+                    data.team2,
+                    data.marketDescription,
+                    platform,
+                    odds
+                  );
+                }}
               />
             ))}
           </div>
@@ -1380,7 +1502,9 @@ export default function Home() {
                 </svg>
                 <span className="text-sm">Search opportunities</span>
               </div>
-              <button className="px-4 py-2.5 rounded-2xl bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/15 transition-colors">
+              <button
+                className="px-4 py-2.5 rounded-2xl bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/15 transition-colors"
+              >
                 Connect Wallet
               </button>
             </div>
@@ -1827,6 +1951,29 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Bet Modal */}
+      {betModalData && (
+        <BetModal
+          isOpen={betModalData.isOpen}
+          onClose={() => setBetModalData(null)}
+          team1={betModalData.team1}
+          team2={betModalData.team2}
+          marketDescription={betModalData.marketDescription}
+          platform={betModalData.platform}
+          odds={betModalData.odds}
+          onConfirm={(amount) =>
+            handleConfirmBet(
+              amount,
+              betModalData.team1,
+              betModalData.team2,
+              betModalData.marketDescription,
+              betModalData.platform,
+              betModalData.odds
+            )
+          }
+        />
+      )}
     </div>
   );
 }
