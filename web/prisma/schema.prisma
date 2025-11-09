@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and profile
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  password      String         // hashed password
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  chatHistories ChatHistory[]
+  
+  @@map("users")
+}
+
+// Chat history per match per user
+model ChatHistory {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketKey         String        // unique identifier for the match (team1-team2-description)
+  team1             String
+  team2             String
+  marketDescription String
+  enabledSources    String[]      // array of enabled source IDs
+  messages          ChatMessage[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  @@unique([userId, marketKey])
+  @@index([userId])
+  @@map("chat_histories")
+}
+
+// Individual chat messages
+model ChatMessage {
+  id            String      @id @default(cuid())
+  chatHistoryId String
+  chatHistory   ChatHistory @relation(fields: [chatHistoryId], references: [id], onDelete: Cascade)
+  role          String      // "user" or "assistant"
+  content       String      @db.Text
+  sources       String[]    // array of source names
+  timestamp     DateTime    @default(now())
+  
+  @@index([chatHistoryId])
+  @@map("chat_messages")
+}
