@@ -14,6 +14,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useSession } from "next-auth/react";
 
 interface Message {
   role: "user" | "assistant";
@@ -57,6 +58,7 @@ export default function ChatbotPanel({
   onClose,
   marketData,
 }: ChatbotPanelProps) {
+  const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -69,44 +71,91 @@ export default function ChatbotPanel({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
 
-  // Generate unique chat ID based on market
-  const chatId =
-    `chat-${marketData.team1}-${marketData.team2}-${marketData.marketDescription}`
+  // Generate unique market key based on market
+  const marketKey =
+    `${marketData.team1}-${marketData.team2}-${marketData.marketDescription}`
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-  // Load chat history from localStorage
+  // Load chat history from database
   useEffect(() => {
-    if (isOpen && !hasInitialized) {
-      const savedChat = localStorage.getItem(chatId);
-      const savedSources = localStorage.getItem(`${chatId}-sources`);
+    const loadChatHistory = async () => {
+      if (!isOpen || !session?.user || hasInitialized) return;
 
-      if (savedSources) {
-        setEnabledSources(JSON.parse(savedSources));
-      }
+      try {
+        const response = await fetch(
+          `/api/chat?marketKey=${encodeURIComponent(marketKey)}`
+        );
 
-      if (savedChat) {
-        const parsedMessages = JSON.parse(savedChat);
-        setMessages(parsedMessages);
-        setHasInitialized(true);
-      } else {
-        // Initialize with first message and auto-analyze
+        if (response.ok) {
+          const data = await response.json();
+
+          if (data.chatHistory) {
+            setMessages(
+              data.chatHistory.messages.map((msg: any) => ({
+                role: msg.role,
+                content: msg.content,
+                sources: msg.sources,
+                timestamp: new Date(msg.timestamp).getTime(),
+              }))
+            );
+            setEnabledSources(
+              data.chatHistory.enabledSources ||
+                AVAILABLE_SOURCES.map((s) => s.id)
+            );
+            setHasInitialized(true);
+          } else {
+            // Initialize with first message and auto-analyze
+            initializeChat();
+          }
+        } else {
+          initializeChat();
+        }
+      } catch (error) {
+        console.error("Error loading chat history:", error);
         initializeChat();
       }
-    }
-  }, [isOpen, chatId, hasInitialized]);
+    };
 
-  // Save messages to localStorage whenever they change
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem(chatId, JSON.stringify(messages));
-    }
-  }, [messages, chatId]);
+    loadChatHistory();
+  }, [isOpen, session, marketKey, hasInitialized]);
 
-  // Save enabled sources to localStorage
+  // Save messages to database whenever they change
   useEffect(() => {
-    localStorage.setItem(`${chatId}-sources`, JSON.stringify(enabledSources));
-  }, [enabledSources, chatId]);
+    const saveChatHistory = async () => {
+      if (!session?.user || messages.length === 0 || !hasInitialized) return;
+
+      try {
+        await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            marketKey,
+            team1: marketData.team1,
+            team2: marketData.team2,
+            marketDescription: marketData.marketDescription,
+            messages,
+            enabledSources,
+          }),
+        });
+      } catch (error) {
+        console.error("Error saving chat history:", error);
+      }
+    };
+
+    // Debounce saving to avoid too many requests
+    const timeoutId = setTimeout(saveChatHistory, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [
+    messages,
+    enabledSources,
+    session,
+    marketKey,
+    marketData,
+    hasInitialized,
+  ]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -231,17 +280,23 @@ export default function ChatbotPanel({
     await performAnalysis(question);
   };
 
-  const handleDeleteChat = () => {
+  const handleDeleteChat = async () => {
     if (
       confirm(
         "Are you sure you want to delete this chat history? This cannot be undone."
       )
     ) {
-      localStorage.removeItem(chatId);
-      localStorage.removeItem(`${chatId}-sources`);
-      setMessages([]);
-      setHasInitialized(false);
-      initializeChat();
+      try {
+        await fetch(`/api/chat?marketKey=${encodeURIComponent(marketKey)}`, {
+          method: "DELETE",
+        });
+
+        setMessages([]);
+        setHasInitialized(false);
+        initializeChat();
+      } catch (error) {
+        console.error("Error deleting chat history:", error);
+      }
     }
   };
 
