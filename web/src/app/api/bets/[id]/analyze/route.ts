@@ -61,9 +61,9 @@ export async function POST(
 
 async function generateGeminiAnalysis(bet: any): Promise<string> {
   const statusText =
-    bet.status === "PENDING"
+    bet.status === "pending"
       ? "pending"
-      : bet.status === "WON"
+      : bet.status === "won"
       ? "won"
       : "lost";
 
