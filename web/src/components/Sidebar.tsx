@@ -71,7 +71,7 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
       <div className="p-8 border-b border-white/5">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center">
-            <span className="text-2xl font-bold text-white">T</span>
+            <Image src="/logo.svg" alt="TUMfoolery Logo" width={100} height={100} />
           </div>
           <span className="text-2xl font-bold text-white tracking-tight">TUMfoolery</span>
         </div>
