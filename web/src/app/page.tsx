@@ -18,6 +18,7 @@ import { KalshiMarket, KalshiMarketsResponse } from "@/lib/kalshi-types";
 import { ManifoldMarket, ManifoldMarketsResponse } from "@/lib/manifold-types";
 import ManifoldMatchCard from "@/components/ManifoldMatchCard";
 import ProfilePage from "@/app/profile/page";
+import HistoryPage from "./history/page";
 
 export default function Home() {
   const [activePage, setActivePage] = useState("dashboard");
@@ -1285,6 +1286,28 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-[#050505] relative overflow-hidden">
         <AnimatedBackground />
+        {/* Bet Modal */}
+        {betModalData && (
+          <BetModal
+            isOpen={betModalData.isOpen}
+            onClose={() => setBetModalData(null)}
+            team1={betModalData.team1}
+            team2={betModalData.team2}
+            marketDescription={betModalData.marketDescription}
+            platform={betModalData.platform}
+            odds={betModalData.odds}
+            onConfirm={(amount) =>
+              handleConfirmBet(
+                amount,
+                betModalData.team1,
+                betModalData.team2,
+                betModalData.marketDescription,
+                betModalData.platform,
+                betModalData.odds
+              )
+            }
+          />
+        )}
         <Sidebar activePage={activePage} onPageChange={setActivePage} />
         <div className="ml-72 p-8 relative z-10">
           <div className="mb-8">
@@ -1480,6 +1503,12 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-[#050505] relative overflow-hidden">
         <AnimatedBackground />
+        {/* Wallet Connect Modal */}
+        <WalletConnectModal
+          isOpen={isWalletModalOpen}
+          onClose={() => setIsWalletModalOpen(false)}
+          onConnect={handleWalletConnect}
+        />
         <Sidebar activePage={activePage} onPageChange={setActivePage} />
         <div className="ml-72 relative z-10">
           {/* Top Bar */}
@@ -1502,11 +1531,22 @@ export default function Home() {
                 </svg>
                 <span className="text-sm">Search opportunities</span>
               </div>
-              <button
-                className="px-4 py-2.5 rounded-2xl bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/15 transition-colors"
-              >
-                Connect Wallet
-              </button>
+              {walletInfo.connected ? (
+                <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-green-500/10 border border-green-500/30">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-sm text-green-400 font-medium font-mono">
+                    {walletInfo.address?.slice(0, 6)}...
+                    {walletInfo.address?.slice(-4)}
+                  </span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsWalletModalOpen(true)}
+                  className="px-4 py-2.5 rounded-2xl bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/15 transition-colors"
+                >
+                  Connect Wallet
+                </button>
+              )}
             </div>
           </div>
 
@@ -1911,6 +1951,18 @@ export default function Home() {
     );
   }
 
+  if (activePage === "history") { 
+    return (
+      <div className="min-h-screen bg-[#050505] relative overflow-hidden">
+        <AnimatedBackground />
+        <Sidebar activePage={activePage} onPageChange={setActivePage} />
+        <div className="ml-72 p-8 relative z-10">
+          <HistoryPage />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#050505] relative overflow-hidden">
       <AnimatedBackground />
@@ -1951,29 +2003,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      {/* Bet Modal */}
-      {betModalData && (
-        <BetModal
-          isOpen={betModalData.isOpen}
-          onClose={() => setBetModalData(null)}
-          team1={betModalData.team1}
-          team2={betModalData.team2}
-          marketDescription={betModalData.marketDescription}
-          platform={betModalData.platform}
-          odds={betModalData.odds}
-          onConfirm={(amount) =>
-            handleConfirmBet(
-              amount,
-              betModalData.team1,
-              betModalData.team2,
-              betModalData.marketDescription,
-              betModalData.platform,
-              betModalData.odds
-            )
-          }
-        />
-      )}
     </div>
   );
 }
