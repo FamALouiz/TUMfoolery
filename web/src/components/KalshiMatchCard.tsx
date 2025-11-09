@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
 import { KalshiMarket } from '@/lib/kalshi-types';
 import { getTeamLogo } from '@/lib/team-logos';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ExternalLink } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface KalshiMatchCardProps {
   markets: KalshiMarket[];
@@ -16,10 +16,6 @@ interface KalshiMatchCardProps {
 export default function KalshiMatchCard({ markets, isExpanded, onToggle }: KalshiMatchCardProps) {
   const [team1LogoError, setTeam1LogoError] = useState(false);
   const [team2LogoError, setTeam2LogoError] = useState(false);
-  
-  const formatPrice = (value: number) => {
-    return `$${value.toFixed(2)}`;
-  };
 
   const formatPriceCents = (value: number) => {
     return `${Math.round(value * 100)}¢`;
@@ -127,7 +123,7 @@ export default function KalshiMatchCard({ markets, isExpanded, onToggle }: Kalsh
   });
 
   // Calculate average probability for display (or use team1 win if available)
-  const displayProbability = team1WinMarket ? team1WinMarket.yes_price : (markets[0]?.yes_price || 0);
+  // const displayProbability = team1WinMarket ? team1WinMarket.yes_price : (markets[0]?.yes_price || 0);
 
   return (
     <motion.div

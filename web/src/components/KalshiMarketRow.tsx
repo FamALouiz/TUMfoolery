@@ -1,11 +1,10 @@
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
 import { KalshiMarket } from '@/lib/kalshi-types';
 import { getTeamLogo } from '@/lib/team-logos';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ExternalLink } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 interface KalshiMarketRowProps {
   market: KalshiMarket;

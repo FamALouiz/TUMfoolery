@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
-import { Opportunity } from '@/lib/types';
-import { useState } from 'react';
-import { CheckCircle2, XCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { getTeamLogo } from '@/lib/team-logos';
+import { Opportunity } from '@/lib/types';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle2, ChevronDown, X, XCircle } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 import SparklineChart from './SparklineChart';
 
 interface OpportunityCardListProps {

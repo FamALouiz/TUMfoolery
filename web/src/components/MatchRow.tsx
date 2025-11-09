@@ -1,11 +1,10 @@
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
-import { MatchPrediction } from '@/lib/types';
 import { getTeamLogo } from '@/lib/team-logos';
-import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { MatchPrediction } from '@/lib/types';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 import SparklineChart from './SparklineChart';
 
 interface MatchRowProps {
