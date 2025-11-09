@@ -40,6 +40,38 @@ export default function BettingHistory({
 }: BettingHistoryProps) {
   const [expandedBet, setExpandedBet] = useState<string | null>(null);
 
+  const formatMarkdownToHTML = (markdown: string): string => {
+    // Simple markdown to HTML converter for basic formatting
+    let html = markdown
+      // Headers
+      .replace(
+        /^### (.*$)/gim,
+        '<h3 class="text-lg font-bold text-white mt-4 mb-2">$1</h3>'
+      )
+      .replace(
+        /^## (.*$)/gim,
+        '<h2 class="text-xl font-bold text-white mt-4 mb-2">$1</h2>'
+      )
+      .replace(
+        /^# (.*$)/gim,
+        '<h1 class="text-2xl font-bold text-white mt-4 mb-2">$1</h1>'
+      )
+      // Bold
+      .replace(
+        /\*\*(.*?)\*\*/g,
+        '<strong class="font-semibold text-white">$1</strong>'
+      )
+      // Italic
+      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+      // Lists
+      .replace(/^\- (.*$)/gim, '<li class="ml-4 mb-1">• $1</li>')
+      // Line breaks
+      .replace(/\n\n/g, "<br/><br/>")
+      .replace(/\n/g, "<br/>");
+
+    return html;
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "won":
@@ -176,22 +208,29 @@ export default function BettingHistory({
             </div>
 
             {/* AI Analysis Button */}
-            <button
-              onClick={() => {
-                if (expandedBet === bet.id) {
-                  setExpandedBet(null);
-                } else {
-                  if (!bet.aiSummary) {
-                    onAnalyzeBet(bet.id);
+            {bet.status.toLowerCase() !== "pending" ? (
+              <button
+                onClick={() => {
+                  if (expandedBet === bet.id) {
+                    setExpandedBet(null);
+                  } else {
+                    if (!bet.aiSummary) {
+                      onAnalyzeBet(bet.id);
+                    }
+                    setExpandedBet(bet.id);
                   }
-                  setExpandedBet(bet.id);
-                }
-              }}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-purple-400 text-xs font-medium hover:from-purple-500/30 hover:to-blue-500/30 transition-all duration-200 flex items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4" />
-              {expandedBet === bet.id ? "Hide" : "AI"} Analysis
-            </button>
+                }}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-purple-400 text-xs font-medium hover:from-purple-500/30 hover:to-blue-500/30 transition-all duration-200 flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                {expandedBet === bet.id ? "Hide" : "AI"} Analysis
+              </button>
+            ) : (
+              <div className="px-4 py-2 rounded-lg bg-gray-500/10 border border-gray-500/30 text-gray-500 text-xs font-medium flex items-center gap-2 cursor-not-allowed">
+                <Sparkles className="w-4 h-4" />
+                Analysis Available After Settlement
+              </div>
+            )}
           </div>
 
           {/* AI Summary */}
@@ -203,10 +242,15 @@ export default function BettingHistory({
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-4 pt-4 border-t border-white/10"
               >
-                <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30">
+                <div className="p-6 rounded-xl bg-purple-500/10 border border-purple-500/30 max-h-[400px] overflow-y-auto">
                   {bet.aiSummary ? (
-                    <div className="text-sm text-gray-300 whitespace-pre-wrap">
-                      {bet.aiSummary}
+                    <div className="prose prose-invert prose-sm max-w-none">
+                      <div
+                        className="text-sm text-gray-300 leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                          __html: formatMarkdownToHTML(bet.aiSummary),
+                        }}
+                      />
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 text-purple-400">
