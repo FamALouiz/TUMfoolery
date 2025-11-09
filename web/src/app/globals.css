@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0D1117;
+  --background: #0d1117;
   --foreground: #ededed;
 }
 
@@ -23,7 +23,8 @@ body {
 
 /* Animated gradient background */
 @keyframes gradient-shift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -54,7 +55,8 @@ body {
 
 /* Floating animation */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
@@ -68,7 +70,8 @@ body {
 
 /* Pulse glow */
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
   }
   50% {
@@ -99,4 +102,94 @@ body {
   );
   background-size: 1000px 100%;
   animation: shimmer 3s infinite;
+}
+
+/* Markdown prose styles for chatbot */
+.prose-chatbot {
+  color: #e5e7eb;
+}
+
+.prose-chatbot h1,
+.prose-chatbot h2,
+.prose-chatbot h3,
+.prose-chatbot h4 {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.prose-chatbot p {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.prose-chatbot ul,
+.prose-chatbot ol {
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.prose-chatbot li {
+  margin-bottom: 0.25rem;
+}
+
+.prose-chatbot code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  color: #c084fc;
+}
+
+.prose-chatbot pre {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.prose-chatbot pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #e5e7eb;
+}
+
+.prose-chatbot a {
+  color: #a78bfa;
+  text-decoration: underline;
+}
+
+.prose-chatbot a:hover {
+  color: #c4b5fd;
+}
+
+.prose-chatbot blockquote {
+  border-left: 4px solid rgba(168, 85, 247, 0.5);
+  padding-left: 1rem;
+  font-style: italic;
+  color: #d1d5db;
+  margin: 0.5rem 0;
+}
+
+.prose-chatbot strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.prose-chatbot table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.prose-chatbot th,
+.prose-chatbot td {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.prose-chatbot th {
+  background-color: rgba(255, 255, 255, 0.05);
+  font-weight: 600;
 }
